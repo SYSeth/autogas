@@ -1,0 +1,35 @@
+from web3 import Web3
+
+# Connect to a local Ethereum node (change the URL to your node's URL)
+w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
+
+# Set the contract address and ABI
+contract_address = '0xContractAddress'
+contract_abi = [
+    # Contract ABI definition
+]
+
+# Create a contract instance
+contract = w3.eth.contract(address=contract_address, abi=contract_abi)
+
+# Estimate gas price
+gas_price = w3.eth.generate_gas_price()
+print(f"Suggested gas price: {gas_price}")
+
+# Estimate gas limit
+gas_limit = contract.functions.myFunction().estimateGas()
+print(f"Estimated gas limit: {gas_limit}")
+
+# Build and send the transaction
+transaction = contract.functions.myFunction().buildTransaction({
+    'from': '0xYourAddress',
+    'nonce': w3.eth.getTransactionCount('0xYourAddress'),
+    'gas': gas_limit,
+    'gasPrice': gas_price,
+})
+
+signed_txn = w3.eth.account.signTransaction(transaction, private_key='0xYourPrivateKey')
+transaction_hash = w3.eth.sendRawTransaction(signed_txn.rawTransaction)
+transaction_receipt = w3.eth.waitForTransactionReceipt(transaction_hash)
+
+print(f"Transaction receipt: {transaction_receipt}")
